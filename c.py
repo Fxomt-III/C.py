@@ -241,9 +241,9 @@ class Compiler:
                 self.extract(If, elseifs, else_)
                 end += f'if ({test}) {{\n{tab(body)}\n}} '
                 for eif in elseifs:
-                    end += f'elseif ({eif[0]}) {{\n{tab(self.isocompile(eif[1]))}\n}} '
+                    end += f'else if ({eif[0]}) {{\n{tab(eif[1])}\n}} '
                 if len(else_) > 0:
-                    end += f'else {{\n{tab(self.isocompile(else_[0]))}\n}}'
+                    end += f'else {{\n{tab(else_[0])}\n}}'
                 end += '\n'
 
             elif self.inst(ast.FunctionDef):
@@ -272,7 +272,19 @@ class Compiler:
                 value = self.isocompile([un.operand])
                 if isinstance(op, ast.USub):
                     end += f'-{value}'
+                if isinstance(op, ast.Not):
+                    end += f'!{value}'
 
+            elif self.inst(ast.BoolOp):
+                boolop = self.peek()
+                op     = boolop.op
+                left   = self.isocompile([boolop.values[0]])
+                right  = self.isocompile([boolop.values[1]])
+
+                if isinstance(op, ast.Or):
+                    end += f'{left} || {right}'
+                elif isinstance(op, ast.And):
+                    end += f'{left} && {right}'
             self.advance()
 
         return end
@@ -315,7 +327,6 @@ def gen_ast(x):
 
 def compile_file(x):
     compiler = Compiler(gen_ast(x))
-
     compiler.add(compiler.compile())
     compiler.write()
 

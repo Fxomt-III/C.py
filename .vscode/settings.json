@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.clua": "lua",
+        "*.cluas": "lua",
+        "*.lalrpop": "lalrpop",
+        "cstdio": "cpp",
+        "cstdarg": "cpp",
+        "string": "cpp"
+    }
+}

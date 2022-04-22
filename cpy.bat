@@ -1,2 +1,2 @@
 @echo off
-python .\c.py %*
+python %~dp0\c.py %*

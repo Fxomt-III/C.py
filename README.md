@@ -33,3 +33,17 @@ C.py compiles to fast, and readable C++.
 
 for simple projects with no python dependencies,
 you should use C.py, otherwise, use Nuitka/Cython/Etc.
+
+## How do i make my program both run on C++ AND python?
+c.py has a special function name called 'py_entry_point', and here is how it works in a nutshell:
+
+```py
+def main(): # Will be ran by C++ only.
+    print("C++ entry point!")
+
+def py_entry_point(): # Will be ran by Python only.
+    print("Python entry point!")
+    main() # you can also call the C++ entrypoint
+
+py_entry_point() # You have to run the entrypoint function, because the compiler will ignore this, but python will not.
+```

@@ -3,47 +3,143 @@ Incomplete Python to C++ Compiler
 
 The compiler is very similiar to my other compiler, [Lua.py](https://github.com/Fxomt-III/Lua.py).
 
-C.py has no lists, yet, BUT you can use the inline C++ ```__cpp__``` to create one.
-
 C.py is a static programming language, not dynamic.
 
-## Examples
-```py
-# Imports
-import libc.no.iostream # #include <iostream>
-import libc.h.iostream # #include <stdio.h>
-import cpp.my_other_cpp_file # #include "my_other_cpp_file.cpp"
-
-import cpp.my.file.in_.folders # #include "my/file/in_/folders.cpp"
+## Tutorial
+### Imports
+in cpy (Will be calling it cpy for the rest of the tutorial), things work differently,
+imports are in this format:
+```python
+import [libc.] <ext>.<directory with .'s as /'s.>
+#      ------  ----- ----------------------------
+```
+libc means if it is out of the directory,
+basically, if libc: use <>, else: use "".
+```
+import libc.h.stdio # <stdio.h>
+import h.stdio # "stdio.h"
+```
+ext is the extension of the file, there is a special extension for importing C++ files,
+the 'no' extension, it means it has no extension.
+```python
+import libc.no.iostream # <iostream>
+import libc.hpp.iostream # <iostream.hpp>
 ```
 
-there are also 'macros':
-```py
-def cppmacro_print(x):
-    print(x)
+the last is obvious.
+### Inline C/++
+To use inline C/++, use the \_\_cpp\_\_ (or \_\_c\_\_ for no-std environments).
+### For loops
+#### No std
+in no-std, the only for loops are range for loops:
+```python
+for int_i in range(0, 10, 1):
+    do_something(i)
+```
+and due to python limitations for not being able to specify types for for loop variables,
+you have to create a for loop variable with < type >_ in the beginning
+```python
+# In range, you have to specify all of the arguments.
+for int_i in range(0, 10, 1):
+    do_something(i)
+```
+#### std
+in std, you can loop with anything:
+```python
+for int_i in list_:
+    do_something(i)
+```
+and due to python limitations for not being able to specify types for for loop variables,
+you have to create a for loop variable with < type >_ in the beginning
+```python
+# In range, you have to specify all of the arguments.
+for int_i in range(0, 10, 1):
+    do_something(i)
+```
+### Variables
+variables are like this:
+```python
+var: int = 123
+```
+### Functions
+```python
+def main() -> int:
+    pass
 
-#define cppmacro_print(x) do { \
-    print(x); \
-} while (false);
+def func_that_returns_auto(): # if you did not specify the type, it will default to 'auto'.
+    pass
 ```
 
-## Why not nuitka or Cython?
-They compile fast, optimized, but unreadable C,
-C.py compiles to fast, and readable C++.
-
-for simple projects with no python dependencies,
-you should use C.py, otherwise, use Nuitka/Cython/Etc.
-
-## How do i make my program both run on C++ AND python?
-c.py has a special function name called 'py_entry_point', and here is how it works in a nutshell:
-
-```py
-def main(): # Will be ran by C++ only.
-    print("C++ entry point!")
-
-def py_entry_point(): # Will be ran by Python only.
-    print("Python entry point!")
-    main() # you can also call the C++ entrypoint
-
-py_entry_point() # You have to run the entrypoint function, because the compiler will ignore this, but python will not.
+### Lists
+```python
+# int myarr[3] = {0, 1, 2, 3};
+arr_var(int, myarr, 3, [0, 1, 2, 3])
 ```
+
+### Conversion
+```python
+# (int)0.1f
+convert(int, 0.1)
+```
+
+### Doubles
+```python
+# 0.1f -> 0.1
+pydouble(0.1)
+```
+
+### Macros
+for no-std use cmacro_, else, use cppmacro.
+you should use this if you want 'python style' macros,
+if you want C/++ macros, use inline C/++.
+```python
+def cmacro_printf(x):
+    show_characters(x) # -> #define cmacro_printf(x) do { \ 
+#                               show_characters(x) \
+#                           } while (false);
+__c__("#define printf(x) show_characters(x);")
+```
+
+### 'Stubs'
+sometimes you want to use a C library, (my_cool_lib.h), but the editor complains that it does not exist,
+to fix this, you use ```from <STUB_NAME> import *```, stub_name can be anything.
+
+```cpp
+// my_cool_lib.h
+void do_something(int x) {
+    printf("%d", x);
+}
+int mycoolvar = 123;
+```
+```py
+# port of my_cool_lib.h
+def do_something(x): pass
+mycoolvar = None
+```
+```py
+#my_cool_cpy_file.py
+from port_mcl import * # CPY will ignore this and will not compile this
+import h.my_cool_lib
+
+do_something(mycoolvar)
+```
+now it will not complain!
+
+### py_entry_point
+Say you want to make a program that will work on C/++ AND python,
+for this you use py_entry_point:
+```python
+def fib(x):
+    if x <= 0:
+        return 1
+    return fib(x - 1) + fib(x - 2)
+
+def main(): # C++ Entry point
+    print("%d", fib(7))
+
+def py_entry_point(): # Python entry point
+    main() # You can also call the C++ entry point, since it is a normal python function
+
+py_entry_point() # Do not forget to call this, cpy will ignore this, but python will not.
+```
+## The end!

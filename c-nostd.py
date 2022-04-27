@@ -1,7 +1,7 @@
 # Basically c.py but it actually compiles to C and has no standard library.
 import ast
 from sys import argv
-
+import os
 def parse_args(x):
     return [f'{Compiler([arg.annotation]).compile()} {arg.arg}' for arg in x]
 
@@ -40,20 +40,20 @@ class Module:
         return f"#include {self.b1}{self.filename}{self.b2}\n"
 
 
-class CPPFile:
+class CFile:
     def __init__(self):
         self.out = ''
 
     def append(self, x):
         self.out += x
 
-    def write(self, out='out.c'):
-        with open(out, 'w') as f:
+    def write(self, out):
+        fname = os.path.splitext(out)[0]+'.c'
+        with open(fname, 'w') as f:
             f.write(self.strip_excess())
 
     def strip_excess(self):
         return self.out.rstrip()
-
 
 def tab(x): return '\n'.join(['    ' + y for y in x.split('\n')]).rstrip()
 
@@ -65,8 +65,8 @@ class Compiler:
     def __init__(self, pyast):
         self.pos = 0
         self.ast = pyast
-        self.cppfile = CPPFile()
-        self.cppfile.append(boilerplate)
+        self.cfile = CFile()
+        self.cfile.append(boilerplate)
 
     def errast(self, node, msg):
         print(f'[compiler {node.lineno}:{node.col_offset}]: {msg}')
@@ -331,10 +331,10 @@ class Compiler:
         self.pos -= 1
 
     def add(self, item):
-        self.cppfile.append(item)
+        self.cfile.append(item)
 
-    def write(self):
-        self.cppfile.write()
+    def write(self, fname):
+        self.cfile.write(fname)
 
     def peek(self):
         return self.ast[self.pos]
@@ -351,7 +351,7 @@ def gen_ast(x):
 def compile_file(x):
     compiler = Compiler(gen_ast(x))
     compiler.add(compiler.compile())
-    compiler.write()
+    compiler.write(x)
 
 
 if len(argv) <= 1:

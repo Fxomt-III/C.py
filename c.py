@@ -1,5 +1,6 @@
 import ast
 from sys import argv
+import os
 
 def parse_args(x):
     return [f'{Compiler([arg.annotation]).compile()} {arg.arg}' for arg in x]
@@ -63,8 +64,9 @@ class CPPFile:
     def append(self, x):
         self.out += x
 
-    def write(self, out='out.cpp'):
-        with open(out, 'w') as f:
+    def write(self, out):
+        fname = os.path.splitext(out)[0]+'.cpp'
+        with open(fname, 'w') as f:
             f.write(self.strip_excess())
 
     def strip_excess(self):
@@ -342,8 +344,8 @@ class Compiler:
     def add(self, item):
         self.cppfile.append(item)
 
-    def write(self):
-        self.cppfile.write()
+    def write(self, x):
+        self.cppfile.write(x)
 
     def peek(self):
         return self.ast[self.pos]
@@ -360,7 +362,7 @@ def gen_ast(x):
 def compile_file(x):
     compiler = Compiler(gen_ast(x))
     compiler.add(compiler.compile())
-    compiler.write()
+    compiler.write(x)
 
 
 if len(argv) <= 1:

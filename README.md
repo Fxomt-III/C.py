@@ -34,14 +34,14 @@ To use inline C/++, use the \_\_c\_\_.
 ### For loops
 ```python
 for int_i in list_:
-    do_something(i)
+    do_something(int_i)
 ```
 due to python limitations for not being able to specify types for for loop variables,
 you have to create a for loop variable with < type >_ in the beginning
 ```python
 # In range, you have to specify all of the arguments.
 for int_i in range(0, 10, 1):
-    do_something(i)
+    do_something(int_i)
 ```
 ### Variables
 variables are like this:
@@ -159,6 +159,32 @@ It will compile to this:
 ```c
 int x = ((2 * 80) * 25) - 2;
 ```
-Why? well let's check the ast:
-(value=BinOp(left=BinOp(left=BinOp(left=Constant(value=2), op=Mult(), right=Name(id='MAX_COLS', ctx=Load())), op=Mult(), right=Constant(value=25)), op=Sub(), right=Constant(value=2)))
-You can see python doee not specift the group, so it has to assume.
+Atleast it works!
+### ppy
+say we wanted to make a program that works in both C/++ And python,
+and we wanted to use strlen, but python only has len, and if
+we try to make a function named strlen, it will override the C
+strlen, to fix this, we use ppy, which is basically an alias for C functions:
+```python
+# cpy will ignore this, therefore not overriding the c strlen.
+def ppystrlen(x): return len(x) 
+def main() -> int:
+    return ppystrlen("Hello")
+```
+
+this will compile to:
+```cpp
+int main() {
+    return strlen("Hello");
+}
+```
+### Char type
+python has no chartype, to fix this, unicode strings are treated as chartypes:
+```py
+putchar(u"A")
+# C: putchar('A');
+```
+### Unsigned types
+```python
+var: pyunsigned(int) = 123
+```

@@ -181,7 +181,11 @@ class Compiler:
                 for_ = self.peek()
                 target = for_.target.id.split('_', 1)
                 typ = target[0]
-                rest = target[1]
+                try:
+                    rest = target[1]
+                except:
+                    self.errast(for_, f"Must have name after type '{typ}'.")
+                    quit(1)
                 iter_ = for_.iter
                 isrange = False
 
@@ -206,6 +210,9 @@ class Compiler:
             elif self.inst(ast.BinOp):
                 binop = self.peek()
                 left = self.isocompile([binop.left])
+                if isinstance(binop.left, ast.BinOp):
+                    left = f'({left})'
+                    
                 op = binop.op
                 right = self.isocompile([binop.right])
 
@@ -384,6 +391,7 @@ class Compiler:
 
 def gen_ast(x):
     tree = ast.parse(open(x).read())
+    print(ast.dump(tree))
     return tree.body
 
 

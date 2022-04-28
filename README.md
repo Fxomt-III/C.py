@@ -1,9 +1,9 @@
 # C.py
 Note: c.py and c-nostd.py have merged, to use print statements, you need to import it manually.
 
-Incomplete Python to C++ Compiler
+Incomplete Python to C/++ Compiler
 
-The compiler is very similiar to my other compiler, [Lua.py](https://github.com/Fxomt-III/Lua.py).
+The compiler is very similiar to my other compiler, [Lua.py](https://github.com/Fxomt-III/Lua.py) (note: lua.py has been discontinued).
 
 C.py is a static programming language, not dynamic.
 
@@ -149,3 +149,16 @@ float           -> float
 pydouble(x)     -> double
 pyunsigned(str) -> unsigned char*
 pyunsigned(int) -> unsigned int
+
+### Math
+cpy's way of compiling math is weird, say we had this operation:
+```py
+x: int = 2*(80)*(25)-2
+```
+It will compile to this:
+```c
+int x = ((2 * 80) * 25) - 2;
+```
+Why? well let's check the ast:
+(value=BinOp(left=BinOp(left=BinOp(left=Constant(value=2), op=Mult(), right=Name(id='MAX_COLS', ctx=Load())), op=Mult(), right=Constant(value=25)), op=Sub(), right=Constant(value=2)))
+You can see python doee not specift the group, so it has to assume.

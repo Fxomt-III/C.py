@@ -1,4 +1,6 @@
 # C.py
+Note: c.py and c-nostd.py have merged, to use print statements, you need to import it manually.
+
 Incomplete Python to C++ Compiler
 
 The compiler is very similiar to my other compiler, [Lua.py](https://github.com/Fxomt-III/Lua.py).
@@ -28,28 +30,13 @@ import libc.hpp.iostream # <iostream.hpp>
 
 the last is obvious.
 ### Inline C/++
-To use inline C/++, use the \_\_cpp\_\_ (or \_\_c\_\_ for no-std environments).
+To use inline C/++, use the \_\_c\_\_.
 ### For loops
-#### No std
-in no-std, the only for loops are range for loops:
-```python
-for int_i in range(0, 10, 1):
-    do_something(i)
-```
-and due to python limitations for not being able to specify types for for loop variables,
-you have to create a for loop variable with < type >_ in the beginning
-```python
-# In range, you have to specify all of the arguments.
-for int_i in range(0, 10, 1):
-    do_something(i)
-```
-#### std
-in std, you can loop with anything:
 ```python
 for int_i in list_:
     do_something(i)
 ```
-and due to python limitations for not being able to specify types for for loop variables,
+due to python limitations for not being able to specify types for for loop variables,
 you have to create a for loop variable with < type >_ in the beginning
 ```python
 # In range, you have to specify all of the arguments.
@@ -84,7 +71,7 @@ convert(int, 0.1)
 
 ### Doubles
 ```python
-# 0.1f -> 0.1
+# 0.1f -> (double)0.1f
 pydouble(0.1)
 ```
 
@@ -98,6 +85,19 @@ def cmacro_printf(x):
 #                               show_characters(x) \
 #                           } while (false);
 __c__("#define printf(x) show_characters(x);")
+```
+If you want to ccreate macros like this:
+```cpp
+#define dead_beef 0xDEADBEEF
+```
+you use this:
+```python
+def cmacro_dead_beef(): nosemi(0xDEADBEEF)
+#define dead_beef 3735928559
+```
+if you did not specify nosemi, it will compile to:
+```cpp
+#define dead_beef 3735928559;
 ```
 
 ### 'Stubs'
@@ -134,12 +134,18 @@ def fib(x):
         return 1
     return fib(x - 1) + fib(x - 2)
 
-def main(): # C++ Entry point
+def main(): # C/++ Entry point
     print("%d", fib(7))
 
 def py_entry_point(): # Python entry point
-    main() # You can also call the C++ entry point, since it is a normal python function
+    main() # You can also call the C/++ entry point, since it is a normal python function
 
 py_entry_point() # Do not forget to call this, cpy will ignore this, but python will not.
 ```
-## The end!
+### Types
+str             -> char*
+int             -> int
+float           -> float
+pydouble(x)     -> double
+pyunsigned(str) -> unsigned char*
+pyunsigned(int) -> unsigned int
